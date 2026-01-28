@@ -125,6 +125,37 @@ func main() {
 	}
 
 
+	
+		func deleteProduk(w http.ResponseWriter, r *http.Request) {
+		// get id
+		idStr := strings.TrimPrefix(r.URL.Path, "/api/produk/")
+	
+		// ganti id int
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "Invalid Produk ID", http.StatusBadRequest)
+			return
+		}
+	
+		// loop produk cari ID, dapet index yang mau dihapus
+		for i, p := range produk {
+			if p.ID == id {
+				// bikin slice baru dengan data sebelum dan sesudah index
+				produk = append(produk[:i], produk[i+1:]...)
+			
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(map[string]string{
+					"message": "sukses delete",
+				})
+				return
+			}
+		}
+
+		http.Error(w, "Produk belum ada", http.StatusNotFound)
+	}
+
+
+
 
 
      fmt.Println("Server started on :8080")
