@@ -2,10 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
 // Produk represents a product in the cashier system
