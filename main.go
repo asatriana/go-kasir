@@ -89,6 +89,43 @@ func main() {
 
 
 
+	// PUT localhost:8080/api/produk/{id}
+	func updateProduk(w http.ResponseWriter, r *http.Request) {
+		// get id dari request
+		idStr := strings.TrimPrefix(r.URL.Path, "/api/produk/")
+
+		// ganti int
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "Invalid Produk ID", http.StatusBadRequest)
+			return
+		}
+
+		// get data dari request
+		var updateProduk Produk
+		err = json.NewDecoder(r.Body).Decode(&updateProduk)
+		if err != nil {
+			http.Error(w, "Invalid request", http.StatusBadRequest)
+			return
+		}
+
+		// loop produk, cari id, ganti sesuai data dari request
+		for i := range produk {
+			if produk[i].ID == id {
+				updateProduk.ID = id
+				produk[i] = updateProduk
+
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(updateProduk)
+				return
+			}
+		}
+	
+		http.Error(w, "Produk belum ada", http.StatusNotFound)
+	}
+
+
+
 
      fmt.Println("Server started on :8080")
      http.ListenAndServe(":8080", nil)
