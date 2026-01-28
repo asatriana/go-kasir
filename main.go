@@ -23,37 +23,46 @@ var produk = []Produk{
 	{ID: 3, Nama: "kecap", Harga: 12000, Stok: 20},
 }
 
-// localhost:8080/health
-http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
-		"status":  "OK",
-		"message": "API Running",
+
+
+
+func main() {
+
+	// localhost:8080/health
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{
+			"status":  "OK",
+			"message": "API Running",
+		})
 	})
-})
 
-// GET localhost:8080/api/produk
-// POST localhost:8080/api/produk
-http.HandleFunc("/api/produk", func(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(produk)
+
+
+	// GET localhost:8080/api/produk
+	// POST localhost:8080/api/produk
+	http.HandleFunc("/api/produk", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == "GET" {
+			w.Header().Set("Content-Type", "application/json")
+			json.NewEncoder(w).Encode(produk)
 		
-	} else if r.Method == "POST" {
-		// baca data dari request
-		var produkBaru Produk
-		err := json.NewDecoder(r.Body).Decode(&produkBaru)
-		if err != nil {
-			http.Error(w, "Invalid request", http.StatusBadRequest)
-			return
+		} else if r.Method == "POST" {
+			// baca data dari request
+			var produkBaru Produk
+			err := json.NewDecoder(r.Body).Decode(&produkBaru)
+			if err != nil {
+				http.Error(w, "Invalid request", http.StatusBadRequest)
+				return
+			}
+
+			// masukkin data ke dalam variable produk
+			produkBaru.ID = len(produk) + 1
+			produk = append(produk, produkBaru)
+
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusCreated) // 201
+			json.NewEncoder(w).Encode(produkBaru)
 		}
+	})
 
-		// masukkin data ke dalam variable produk
-		produkBaru.ID = len(produk) + 1
-		produk = append(produk, produkBaru)
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusCreated) // 201
-		json.NewEncoder(w).Encode(produkBaru)
-	}
-})
+}
