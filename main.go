@@ -31,3 +31,29 @@ http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		"message": "API Running",
 	})
 })
+
+// GET localhost:8080/api/produk
+// POST localhost:8080/api/produk
+http.HandleFunc("/api/produk", func(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(produk)
+		
+	} else if r.Method == "POST" {
+		// baca data dari request
+		var produkBaru Produk
+		err := json.NewDecoder(r.Body).Decode(&produkBaru)
+		if err != nil {
+			http.Error(w, "Invalid request", http.StatusBadRequest)
+			return
+		}
+
+		// masukkin data ke dalam variable produk
+		produkBaru.ID = len(produk) + 1
+		produk = append(produk, produkBaru)
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated) // 201
+		json.NewEncoder(w).Encode(produkBaru)
+	}
+})
