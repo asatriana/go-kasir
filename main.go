@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"fmt"
 )
 
 // Produk represents a product in the cashier system
@@ -61,5 +62,35 @@ func main() {
 			json.NewEncoder(w).Encode(produkBaru)
 		}
 	})
+
+
+	func getProdukByID(w http.ResponseWriter, r *http.Request) {
+		// Parse ID dari URL path
+		// URL: /api/produk/123 -> ID = 123
+		idStr := strings.TrimPrefix(r.URL.Path, "/api/produk/")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			http.Error(w, "Invalid Produk ID", http.StatusBadRequest)
+			return
+		}
+
+		// Cari produk dengan ID tersebut
+		for _, p := range produk {
+			if p.ID == id {
+				w.Header().Set("Content-Type", "application/json")
+				json.NewEncoder(w).Encode(p)
+				return
+			}
+		}
+
+		// Kalau tidak found
+		http.Error(w, "Produk belum ada", http.StatusNotFound)
+	}
+
+
+
+
+     fmt.Println("Server started on :8080")
+     http.ListenAndServe(":8080", nil)
 
 }
